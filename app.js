@@ -2,34 +2,26 @@ const express = require("express");
 const cors = require("cors");
 const crypto = require("crypto");
 const mongoose = require("mongoose");
+require("dotenv").config();
+
+const authRoutes = require("./routes/authRoutes");
+const scanRoutes = require("./routes/scanRoutes");
 
 const app = express();
+
 app.use(cors());
 app.use(express.json());
+
+app.use("/api/auth", authRoutes);
+app.use("/api/scan", scanRoutes);
+
 
 /* =========================
    MONGODB CONNECTION
 ========================= */
-mongoose.connect("mongodb://127.0.0.1:27017/trustlayer")
+mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log("MongoDB Connected ✅"))
     .catch(err => console.log(err));
-
-/* =========================
-   SCHEMA + MODEL
-========================= */
-const scanSchema = new mongoose.Schema({
-    text: String,
-    domain: String,
-    riskScore: Number,
-    level: String,
-    hash: String,
-    createdAt: {
-        type: Date,
-        default: Date.now
-    }
-});
-
-const Scan = mongoose.model("Scan", scanSchema);
 
 /* =========================
    ROOT ROUTE
